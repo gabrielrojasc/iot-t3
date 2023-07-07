@@ -1,13 +1,13 @@
-import db
+from modules import db
 import os
 import time
 import traceback
 import asyncio
 import logging
-from struct import pack
-from bleak import BleakClient
+from struct import pack, unpack_from
+from bleak import BleakClient, BleakScanner
 from enum import Enum
-from unpacking import parse_data
+from modules.unpacking import parse_data
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BLE")
@@ -18,6 +18,36 @@ CHARACTERISTIC_UUID = "0000FF01-0000-1000-8000-00805f9b34fb"
 
 def get_config_packet(status, protocol):
     return pack("<2B2c", 3, 0, chr(status).encode(), protocol.encode())
+
+
+class MyScanner:
+    def __init__(self, timeout=20):
+        self._scanner = BleakScanner()
+        self._scanner.register_detection_callback(self.detection_callback)
+        self.scanning = asyncio.Event()
+        self.devices = []
+        self.timeout = timeout
+
+    def detection_callback(self, device, advertisement_data):
+        # Looking for:
+        # AdvertisementData(service_data={
+        # '0000feaa-0000-1000-8000-00805f9b34fb': b'\x00\xf6\x00\x00\x00Jupiter\x00\x00\x00\x00\x00\x0b'},
+        # service_uuids=['0000feaa-0000-1000-8000-00805f9b34fb'])
+        self.devices.append((device, advertisement_data))
+
+    async def run(self):
+        await self._scanner.start()
+        self.scanning.set()
+        end_time = loop.time() + self.timeout
+        while self.scanning.is_set():
+            if loop.time() > end_time:
+                self.scanning.clear()
+                print("\t\tScan has timed out so we terminate")
+            await asyncio.sleep(0.1)
+        await self._scanner.stop()
+
+    def get_devices(self):
+        return self.devices
 
 
 class State(Enum):
@@ -171,6 +201,11 @@ class StateMachine(GATTHelper):
 
 
 if __name__ == "__main__":
+    my_scanner = MyScanner()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(my_scanner.run())
+    detected = my_scanner.get_devices()
+
     if os.environ.get("DEMO") == "1":
         # run case status=30 and 31 with protocol 3
         configs = [("3", 30), ("3", 31)]
