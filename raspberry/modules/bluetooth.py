@@ -12,9 +12,6 @@ from modules.unpacking import parse_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BLE")
 
-DEVICE_ADDRESS = "4C:EB:D6:62:18:3A"
-CHARACTERISTIC_UUID = "0000FF01-0000-1000-8000-00805f9b34fb"
-
 
 def get_config_packet(status, protocol):
     return pack("<2B2c", 3, 0, chr(status).encode(), protocol.encode())
@@ -84,13 +81,15 @@ class GATTHelper:
 
 
 class StateMachine(GATTHelper):
-    def __init__(self, status, protocol):
+    def __init__(self, status, protocol, device_address, char_uuid):
         self.status = status
         self.protocol = protocol
         self.set_state(State.DISCONNECTED)
         self.loop = asyncio.get_event_loop()
-        self.device_address = "4C:EB:D6:62:18:3A"
-        self.characteristic_uuid = "0000FF01-0000-1000-8000-00805f9b34fb"
+        # self.device_address = "4C:EB:D6:62:18:3A"
+        # self.characteristic_uuid = "0000FF01-0000-1000-8000-00805f9b34fb"
+        self.device_address = device_address
+        self.characteristic_uuid = char_uuid
         self.packets_received = 0
         self.time_to_connect = 0.0
         self.connection_attempts = 0

@@ -8,10 +8,10 @@
 
 #include <time.h>
 
-extern char *dataprotocol0();
 extern char *dataprotocol1();
 extern char *dataprotocol2();
 extern char *dataprotocol3();
+extern char *dataprotocol4();
 unsigned short dataLength(char protocol);
 
 /*
@@ -39,10 +39,10 @@ char *header(char protocol, char transportLayer)
   return head;
 }
 
-unsigned short lengmsg[5] = {6, 16, 20, 44, 24016};
+unsigned short lengmsg[5] = {6, 16, 20, 44, 48016};
 unsigned short dataLength(char protocol)
 {
-  return lengmsg[(unsigned short)protocol - 48];
+  return lengmsg[(unsigned short)protocol - 49];
 }
 
 unsigned short messageLength(char protocol)
@@ -58,9 +58,6 @@ char *mensaje(char protocol, char transportLayer)
   char *data;
   switch (protocol)
   {
-  case '0':
-    data = dataprotocol0();
-    break;
   case '1':
     data = dataprotocol1();
     break;
@@ -70,8 +67,14 @@ char *mensaje(char protocol, char transportLayer)
   case '3':
     data = dataprotocol3();
     break;
+  case '4':
+    data = dataprotocol4();
+    break;
+  case '5':
+    data = dataprotocol5();
+    break;
   default:
-    data = dataprotocol0();
+    data = dataprotocol1();
     break;
   }
   memcpy((void *)mnsj, (void *)hdr, 12);
@@ -83,10 +86,10 @@ char *mensaje(char protocol, char transportLayer)
 }
 
 // Arma un paquete para el protocolo 0, con la bateria
-char *dataprotocol0()
+char *dataprotocol1()
 {
 
-  char *msg = malloc(dataLength('0'));
+  char *msg = malloc(dataLength('1'));
   char val = '1';
   msg[0] = val;
   char batt = (void *)batt_sensor();
@@ -96,13 +99,13 @@ char *dataprotocol0()
   return msg;
 }
 
-char *dataprotocol1()
+char *dataprotocol2()
 {
 
-  char *msg = malloc(dataLength('1'));
-  char *msg0 = dataprotocol0();
-  memcpy((void *)&(msg[0]), (void *)msg0, dataLength('0'));
-  free(msg0);
+  char *msg = malloc(dataLength('2'));
+  char *msg1 = dataprotocol1();
+  memcpy((void *)&(msg[0]), (void *)msg1, dataLength('1'));
+  free(msg1);
 
   char temp = THPC_sensor_temp();
   msg[6] = temp;
@@ -119,13 +122,13 @@ char *dataprotocol1()
   return msg;
 }
 
-char *dataprotocol2()
+char *dataprotocol3()
 {
 
-  char *msg = malloc(dataLength('2'));
-  char *msg1 = dataprotocol1();
-  memcpy((void *)&(msg[0]), (void *)msg1, dataLength('1'));
-  free(msg1);
+  char *msg = malloc(dataLength('3'));
+  char *msg2 = dataprotocol2();
+  memcpy((void *)&(msg[0]), (void *)msg2, dataLength('2'));
+  free(msg2);
 
   float amp_x = acc_kpi_amp_x();
   float amp_y = acc_kpi_amp_y();
@@ -136,13 +139,13 @@ char *dataprotocol2()
   return msg;
 }
 
-char *dataprotocol3()
+char *dataprotocol4()
 {
 
-  char *msg = malloc(dataLength('3'));
-  char *msg1 = dataprotocol1();
-  memcpy((void *)&(msg[0]), (void *)msg1, dataLength('1'));
-  free(msg1);
+  char *msg = malloc(dataLength('4'));
+  char *msg2 = dataprotocol2();
+  memcpy((void *)&(msg[0]), (void *)msg2, dataLength('2'));
+  free(msg2);
 
   float amp_x = acc_kpi_amp_x();
   float amp_y = acc_kpi_amp_y();
@@ -161,6 +164,34 @@ char *dataprotocol3()
   memcpy((void *)&(msg[36]), (void *)&amp_z, 4);
   float frec_z = acc_kpi_frec_z();
   memcpy((void *)&(msg[40]), (void *)&frec_z, 4);
+
+  return msg;
+}
+
+char *dataprotocol5()
+{
+  char *msg = malloc(dataLength('5'));
+  char *msg2 = dataprotocol2();
+  memcpy((void *)&(msg[0]), (void *)msg2, dataLength('2'));
+  free(msg2);
+
+  float *acc_x = acc_sensor_acc_x();
+  memcpy((void *)&(msg[16]), (void *)&acc_x, 8000);
+
+  float *acc_y = acc_sensor_acc_y();
+  memcpy((void *)&(msg[8016]), (void *)&acc_y, 8000);
+
+  float *acc_z = acc_sensor_acc_z();
+  memcpy((void *)&(msg[16016]), (void *)&acc_z, 8000);
+
+  float *rgyr_x = acc_sensor_rgyr_x();
+  memcpy((void *)&(msg[24016]), (void *)&rgyr_x, 8000);
+
+  float *rgyr_y = acc_sensor_rgyr_y();
+  memcpy((void *)&(msg[32016]), (void *)&rgyr_y, 8000);
+
+  float *rgyr_z = acc_sensor_rgyr_z();
+  memcpy((void *)&(msg[40016]), (void *)&rgyr_z, 8000);
 
   return msg;
 }

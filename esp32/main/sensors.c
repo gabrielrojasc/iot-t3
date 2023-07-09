@@ -31,8 +31,7 @@ float *acc_sensor_acc_x()
   float *arr = malloc(2000 * sizeof(float));
   for (int i = 0; i < 2000; i++)
   {
-    float n = floatrand(-8000, 8000);
-    arr[i] = 2.0 * sinf(2.0 * M_PI * 0.001 * n);
+    arr[i] = floatrand(-16, 16);
   }
   return arr;
 }
@@ -42,8 +41,7 @@ float *acc_sensor_acc_y()
   float *arr = malloc(2000 * sizeof(float));
   for (int i = 0; i < 2000; i++)
   {
-    float n = floatrand(-8000, 8000);
-    arr[i] = 3.0 * cosf(2.0 * M_PI * 0.001 * n);
+    arr[i] = floatrand(-16, 16);
   }
   return arr;
 }
@@ -53,8 +51,37 @@ float *acc_sensor_acc_z()
   float *arr = malloc(2000 * sizeof(float));
   for (int i = 0; i < 2000; i++)
   {
-    float n = floatrand(-8000, 8000);
-    arr[i] = 10.0 * sinf(2.0 * M_PI * 0.001 * n);
+    arr[i] = floatrand(-16, 16);
+  }
+  return arr;
+}
+
+float *acc_sensor_rgyr_x()
+{
+  float *arr = malloc(2000 * sizeof(float));
+  for (int i = 0; i < 2000; i++)
+  {
+    arr[i] = floatrand(-1000, 1000);
+  }
+  return arr;
+}
+
+float *acc_sensor_rgyr_y()
+{
+  float *arr = malloc(2000 * sizeof(float));
+  for (int i = 0; i < 2000; i++)
+  {
+    arr[i] = floatrand(-1000, 1000);
+  }
+  return arr;
+}
+
+float *acc_sensor_rgyr_z()
+{
+  float *arr = malloc(2000 * sizeof(float));
+  for (int i = 0; i < 2000; i++)
+  {
+    arr[i] = floatrand(-1000, 1000);
   }
   return arr;
 }
@@ -71,10 +98,10 @@ char THPC_sensor_hum()
   return n;
 }
 
-float THPC_sensor_pres()
+int THPC_sensor_pres()
 {
   float n = floatrand(1000, 1200);
-  return n;
+  return (int) n;
 }
 
 float THPC_sensor_co()
