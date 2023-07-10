@@ -1,5 +1,5 @@
 import traceback
-from db import data_save
+from db.functions import data_save
 from struct import unpack, pack
 
 # Documentación struct unpack,pack :https://docs.python.org/3/library/struct.html#
@@ -76,7 +76,7 @@ def header_dict(data):
             protocol,
             leng_msg,
         ) = unpack("<2s6BccH", data)
-    except Exception as e:
+    except Exception:
         traceback.print_exc()
         return None
     MAC = ":".join([hex(x)[2:] for x in [M1, M2, M3, M4, M5, M6]])

@@ -1,9 +1,9 @@
-import db
 import os
 import time
 import traceback
 import asyncio
 import logging
+from db.functions import save_loss, get_configs
 from struct import pack
 from bleak import BleakClient
 from enum import Enum
@@ -103,12 +103,12 @@ class StateMachine(GATTHelper):
             self.set_state(successful_state)
             self.time_to_connect += time.time() - t1
             self.save_loss()
-        except Exception as e:
+        except Exception:
             self.set_state(error_state)
             self.time_to_connect += time.time() - t1
 
     def save_loss(self):
-        db.save_loss(self.time_to_connect, self.connection_attempts)
+        save_loss(self.time_to_connect, self.connection_attempts)
         self.time_to_connect = 0.0
         self.connection_attempts = 0
 
@@ -121,7 +121,7 @@ class StateMachine(GATTHelper):
             self.susbscribe_gatt_char(self.notify_callback)
             logger.info("Subscribed to device")
             self.set_state(State.CONNECTED)
-        except Exception as e:
+        except Exception:
             self.set_state(State.RECONNECTING)
 
     def connected_state(self):
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         configs = [("3", 30), ("3", 31)]
     else:
         # get from db
-        configs = db.get_configs()
+        configs = get_configs()
 
     for protocol, status in configs:
         logger.info(f"Starting with {protocol=}, {status=}")
