@@ -4,8 +4,8 @@ import sys
 import select
 from struct import pack
 
-from unpacking import parse_data
-from db import get_configs
+from .unpacking import parse_data
+from .db import get_configs
 
 
 def TCP_frag_recv(conn):

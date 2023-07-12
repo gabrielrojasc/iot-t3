@@ -12,6 +12,7 @@ from modules.unpacking import parse_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BLE")
 
+scan_loop = asyncio.get_event_loop()
 
 def get_config_packet(status, protocol):
     return pack("<2B2c", 3, 0, chr(status).encode(), protocol.encode())
@@ -35,9 +36,9 @@ class MyScanner:
     async def run(self):
         await self._scanner.start()
         self.scanning.set()
-        end_time = loop.time() + self.timeout
+        end_time = scan_loop.time() + self.timeout
         while self.scanning.is_set():
-            if loop.time() > end_time:
+            if scan_loop.time() > end_time:
                 self.scanning.clear()
                 print("\t\tScan has timed out so we terminate")
             await asyncio.sleep(0.1)

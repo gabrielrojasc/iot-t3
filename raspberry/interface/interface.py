@@ -51,14 +51,13 @@ class Controller:
 
     def scan_devices(self):
         print("Escaneando dispositivos disponibles...")
-        # my_scanner = MyScanner()
-        # loop = asyncio.get_event_loop()
-        # loop.run_until_complete(my_scanner.run())
-        # self.available_devices = my_scanner.get_devices()
-        # print(f"Dispositivos encontrados: {self.available_devices}")
-        # devices_names = [device.name for device, _ in self.available_devices]
-        # self.ui.selec_esp.addItems(devices_names)
-        pass
+        my_scanner = MyScanner()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(my_scanner.run())
+        self.available_devices = my_scanner.get_devices()
+        print(f"Dispositivos encontrados: {self.available_devices}")
+        devices_names = [device.name for device, _ in self.available_devices]
+        self.ui.selec_esp.addItems(devices_names)
 
     def set_device(self, index):
         # TODO: SET DEVICE

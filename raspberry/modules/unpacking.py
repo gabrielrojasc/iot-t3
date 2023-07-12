@@ -1,5 +1,5 @@
 import traceback
-from db import data_save
+from .db import data_save
 from struct import unpack, pack
 
 # Documentación struct unpack,pack :https://docs.python.org/3/library/struct.html#
