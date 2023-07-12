@@ -1,9 +1,10 @@
-from .iot import Ui_Dialog
+import asyncio
+
+from modules import wifi_server
+from modules.bluetooth import MyScanner
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from modules.bluetooth import MyScanner
-from modules import wifi_server
-import asyncio
+from .iot import Ui_Dialog
 
 ALL_STATUS = [0, 20, 21, 22, 23, 30, 31]
 ALL_PROTOCOLS = [1, 2, 3, 4, 5]
@@ -56,7 +57,7 @@ class Controller:
         loop.run_until_complete(my_scanner.run())
         self.available_devices = my_scanner.get_devices()
         print(f"Dispositivos encontrados: {self.available_devices}")
-        devices_names = [device.name for device, _ in self.available_devices]
+        devices_names = [name for _, name in self.available_devices]
         self.ui.selec_esp.addItems(devices_names)
 
     def set_device(self, index):

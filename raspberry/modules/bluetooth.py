@@ -1,18 +1,20 @@
-from modules import db
+import asyncio
+import logging
 import os
 import time
 import traceback
-import asyncio
-import logging
-from struct import pack, unpack_from
-from bleak import BleakClient, BleakScanner
 from enum import Enum
+from struct import pack, unpack_from
+
+from bleak import BleakClient, BleakScanner
+from modules import db
 from modules.unpacking import parse_data
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BLE")
 
 scan_loop = asyncio.get_event_loop()
+
 
 def get_config_packet(status, protocol):
     return pack("<2B2c", 3, 0, chr(status).encode(), protocol.encode())
@@ -31,7 +33,10 @@ class MyScanner:
         # AdvertisementData(service_data={
         # '0000feaa-0000-1000-8000-00805f9b34fb': b'\x00\xf6\x00\x00\x00Jupiter\x00\x00\x00\x00\x00\x0b'},
         # service_uuids=['0000feaa-0000-1000-8000-00805f9b34fb'])
-        self.devices.append((device, advertisement_data))
+        device_name = advertisement_data.local_name
+        # We add only devices that a name included in advertising data
+        if device_name is not None:
+            self.devices.append((device, device_name))
 
     async def run(self):
         await self._scanner.start()
