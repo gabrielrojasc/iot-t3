@@ -1,7 +1,7 @@
 import asyncio
 
 from modules import wifi_server
-from modules.bluetooth import MyScanner
+from modules.bluetooth import MyScanner, State
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .iot import Ui_Dialog
@@ -22,6 +22,7 @@ class Controller:
         self.status = 0
         self.protocol = 1
         self.config = None
+        self.sm = None
         # TODO: Obtener de la base de datos:
         # {status_select_index: (status, [protocols])}
         self.status_protocol = {
@@ -128,13 +129,13 @@ class Controller:
             print(f"Starting with {self.protocol=}, {self.status=}")
             print()
             # Nota: service_uuids puede venir vacia. Quizás debamos guardar manualmente el characteristics_uuid
-            sm = StateMachine(
+            self.sm = StateMachine(
                 self.status,
                 str(self.protocol),
                 self.device.address,
                 self.advertisement_data.service_uuids[0],
             )
-            sm.start()
+            self.sm.start()
         # TODO: WIFI Connection
         # WIFI Connection
         elif self.status in WIFI_STATUS:
@@ -187,6 +188,7 @@ class Controller:
         # TODO: Detener conexión entre ESP y Raspberry
         # Sinceramente no se me ocurre de 1era como hacer esto
         print(f"Deteniendo conexión con dispositivo {self.device}...")
+        self.sm.set_state(State.DISCONNECTING)
         return
 
 

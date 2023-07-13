@@ -35,7 +35,7 @@ class MyScanner:
         # service_uuids=['0000feaa-0000-1000-8000-00805f9b34fb'])
         device_name = advertisement_data.local_name
         # We add only devices that a name included in advertising data
-        if device_name is not None:
+        if device_name is None:
             device_name = device.name
 
         self.devices.append((device, device_name))
