@@ -36,7 +36,9 @@ class MyScanner:
         device_name = advertisement_data.local_name
         # We add only devices that a name included in advertising data
         if device_name is not None:
-            self.devices.append((device, device_name))
+            device_name = device.name
+
+        self.devices.append((device, device_name))
 
     async def run(self):
         await self._scanner.start()
