@@ -1,7 +1,7 @@
 import asyncio
 
 from modules import wifi_server
-from modules.bluetooth import MyScanner, State
+from modules.bluetooth import MyScanner, State, StateMachine
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .iot import Ui_Dialog

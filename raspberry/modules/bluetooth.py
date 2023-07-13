@@ -26,6 +26,7 @@ class MyScanner:
         self._scanner.register_detection_callback(self.detection_callback)
         self.scanning = asyncio.Event()
         self.devices = []
+        self.devices_names = []
         self.timeout = timeout
 
     def detection_callback(self, device, advertisement_data):
@@ -38,7 +39,9 @@ class MyScanner:
         if device_name is None:
             device_name = device.name
 
-        self.devices.append((device, device_name))
+        if device_name not in self.devices_names:
+            self.devices.append((device, device_name))
+            self.devices_names.append(device_name)
 
     async def run(self):
         await self._scanner.start()
